@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <form action="" method="get">
+        {{ form.as_p }}
+        <input type="submit" value="Search">
+    </form><br/><br/>
+
+
+    <h2>new post</h2>
+    <form action="" method="post" class="col-md-6" novalidate>
+        {% csrf_token %}
+        {{ create_post.as_p }}
+        <input type="submit" value="post">
+    </form><br/><br/>
+
+    <div class="card">
+        {% for post in posts %}
+            <a href="{{ post.get_absolute_url }}" class="card-body">{{ post.body|truncatewords:8 }} '/n' {{ post.user }}</a>
+        {% endfor %}
+    </div>
+{% endblock %}
