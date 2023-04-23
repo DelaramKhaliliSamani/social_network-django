@@ -6,8 +6,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
-from .models import Relation
-from .forms import EditUserForm, UserCreationForm, UserLoginForm
+from .models import Relation, DirectMessage
+from .forms import EditUserForm, UserCreationForm, UserLoginForm, DirectMessageForm
+from itertools import chain
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 
 class UserRegisterView(View):
@@ -146,8 +149,7 @@ class EditUserView(LoginRequiredMixin, View):
     form_class = EditUserForm
 
     def get(self, request):
-        form = self.form_class(instance=request.user.profile, initial={'phone_number':request.user.phone_number,
-        'email':request.user.email, 'full_name':request.user.full_name})
+        form = self.form_class(instance=request.user.profile, initial={'phone_number':request.user.phone_number, 'email':request.user.email, 'full_name':request.user.full_name})
         return render(request, 'accounts/edit_profile.html', {'form': form})
 
     def post(self, request):
@@ -160,4 +162,37 @@ class EditUserView(LoginRequiredMixin, View):
             request.user.save()
             messages.success(request, 'profile edited successfully', 'success')
         return redirect('accounts:user_profile', request.user.id)
+
+
+
+class DirectMessageView(LoginRequiredMixin, View):
+
+    form_class = DirectMessageForm
+    def dispatch(self, request, user_id):
+        user = User.objects.get(id=user_id)
+        if user.id != request.user.id:
+            return super().dispatch(request, user_id)
+        else:
+            messages.error(request, 'you cant sent message to your account', 'danger')
+            return redirect('accounts:user_profile', user.id)
+
+    def get(self, request, user_id):
+        form = self.form_class
+        message1 = DirectMessage.objects.filter(from_user=request.user.id , to_user=user_id)
+        message2 = DirectMessage.objects.filter(from_user=user_id, to_user=request.user.id)
+        message = chain(message1,message2)
+        return render(request, 'accounts/messages.html', {'form': form, 'message': message})
+
+    @method_decorator(login_required)
+    def post(self, request, user_id):
+        form = self.form_class(request.POST)
+        new_message = form.save(commit=False)
+        new_message.body = form.cleaned_data['body']
+        new_message.from_user = request.user
+        new_message.to_user = User.objects.get(id=user_id)
+        new_message.save()
+        messages.success(request, 'you sent a new message', 'success')
+        return redirect('accounts:message', user_id)
+
+
 

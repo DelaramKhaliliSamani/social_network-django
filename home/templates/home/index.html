@@ -15,9 +15,13 @@
         <input type="submit" value="post">
     </form><br/><br/>
 
-    <div class="card">
-        {% for post in posts %}
-            <a href="{{ post.get_absolute_url }}" class="card-body">{{ post.body|truncatewords:8 }} '/n' {{ post.user }}</a>
-        {% endfor %}
-    </div>
+
+     {% for post in posts %}
+        <div class="card bg-dark text-white">
+            <p class="card-header">{{ post.user }} | {{ post.created|timesince }}</p>
+            <a href="{{ post.get_absolute_url }}" class="card-body">{{ post.body|truncatewords:8 }}</a>
+        </div><br/>
+         {% empty %}
+        <p>No comments yet!</p>
+    {% endfor %}
 {% endblock %}

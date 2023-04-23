@@ -1,4 +1,4 @@
-from .models import User, Profile
+from .models import User, Profile, DirectMessage
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django import forms
@@ -59,8 +59,6 @@ class UserChangeForm(forms.ModelForm):
         fields = ('staff_id', 'phone_number', 'email', 'full_name', 'password', 'last_login')
 
 
-
-
 class UserLoginForm(forms.Form):
 
     staff_id = forms.CharField(widget=forms.TextInput())
@@ -77,3 +75,10 @@ class EditUserForm(forms.ModelForm):
 	    fields = ('bio', 'img')
 
 
+class DirectMessageForm(forms.ModelForm):
+    class Meta:
+        model = DirectMessage
+        fields = ('body',)
+        widgets = {
+            'body': forms.Textarea(attrs={'class': 'form-control'})
+        }

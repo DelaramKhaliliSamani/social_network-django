@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h2>new message</h2>
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Create">
+    </form>
+
+    {% for message in message %}
+        <div class="card bg-dark text-white">
+            <p class="card-header">{{ message.from_user }} | {{ message.created|timesince }}</p>
+            <p class="card-body">{{ message.body }}</p>
+        </div><br/>
+    {% empty %}
+        <p>No messages yet!</p>
+    {% endfor %}
+
+{% endblock %}
+

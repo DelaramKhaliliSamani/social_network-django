@@ -3,7 +3,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .forms import UserChangeForm, UserCreationForm
 from .models import User
-from .models import Relation, Profile
+from .models import Relation, Profile, DirectMessage
 
 
 class UserAdmin(BaseUserAdmin):
@@ -36,4 +36,5 @@ class ProfileInline(admin.StackedInline):
 admin.site.unregister(Group)
 admin.site.register(User, UserAdmin)
 admin.site.register(Relation)
+admin.site.register(DirectMessage)
 admin.site.register(Profile)
