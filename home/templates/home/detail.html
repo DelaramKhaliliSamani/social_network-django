@@ -7,12 +7,16 @@
         <a href="{% url 'home:post_update' post.id %}" class="btn btn-info">Update</a>
     {% endif %}
 
-    <p><a href="{% url 'accounts:user_profile' post.user.id %}">{{ post.user.full_name }}</a> - {{ post.updated|date:"YM"}}</p>
+    <p><a href="{% url 'accounts:user_profile' post.user.id %}">{{ post.user.full_name }}</a> - {{ post.updated|date:"Y-M" }}</p>
     <p>{{ post.body }}</p><hr/>
 
     {% if request.user.is_authenticated %}
-
-        <a href="{% url 'home:post_like' post.id %}" class="{% if can_like %}disabled{% endif %} btn btn-primary col-md-2">Like {{ post.likes_count }}</a>
+        {% if can_like %}
+            <a href="{% url 'home:post_dislike' post.id %}" class=" btn btn-primary col-md-2"> Dislike </a>
+        {% else %}
+            <a href="{% url 'home:post_like' post.id %}" class=" btn btn-primary col-md-2"> Like </a>
+         {% endif %}
+        <p>{{ post.likes_count }}  like </p>
 
         <form action="" method="post">
             {% csrf_token %}
@@ -29,7 +33,7 @@
             <p class="card-body">{{ comment.body }}</p>
 
             {% if request.user.is_authenticated %}
-                <form action="{% url 'home:add_reply' post.id comment.id %}" method="post" style="display:none;">
+                <form action="{% url 'home:add_reply' post.id comment.id %}" method="post" style="">
                     {% csrf_token %}
                     {{ reply_form.as_p }}
                     <input type="submit" value="send">

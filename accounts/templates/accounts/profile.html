@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-
 {% block content %}
-    <h2 class="text-center">Hello {{user.full_name}}</h2>
+    <img src="{{ user.profile.img.url }}" class="img-thumbnail" >
+    <h3 class="text-left">{{user.full_name}}</h3><br/><br/>
 
     {% if request.user.id == user.id %}
         <a href="{% url 'home:post_create' %}" class="btn btn-primary">Create Post</a>
@@ -16,12 +16,14 @@
 
     {% if request.user.id != user.id%}
         <a class="btn btn-primary" href="{% url 'accounts:message' user.id %}">message</a>
-    {% endif %}
+    {% endif %}<br/><br/>
 
-
-    <div class="card">
-        {% for post in posts %}
+    {% for post in posts %}
+        <div class="card bg-dark text-white">
+            <p class="card-header"> {{ post.created }}</p>
             <a href="{{ post.get_absolute_url }}" class="card-body">{{ post.body|truncatewords:8 }}</a>
-        {% endfor %}
-    </div>
+        </div>
+    {% empty %}
+     <p>No comments yet!</p>
+    {% endfor %}
 {% endblock %}

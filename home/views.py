@@ -145,9 +145,17 @@ class PostLikeView(LoginRequiredMixin, View):
 	def get(self, request, post_id):
 		post = get_object_or_404(Post, id=post_id)
 		like = Vote.objects.filter(post=post, user=request.user)
-		if like.exists():
-			messages.error(request, 'you have already liked this post', 'danger')
-		else:
+		if not like.exists():
 			Vote.objects.create(post=post, user=request.user)
 			messages.success(request, 'you liked this post', 'success')
+		return redirect('home:post_detail', post.id, post.slug)
+
+
+class PostDiLikeView(LoginRequiredMixin, View):
+	def get(self, request, post_id):
+		post = get_object_or_404(Post, id=post_id)
+		like = Vote.objects.filter(post=post, user=request.user)
+		if like.exists():
+			like.delete()
+			messages.success(request, 'you disliked this post', 'success')
 		return redirect('home:post_detail', post.id, post.slug)

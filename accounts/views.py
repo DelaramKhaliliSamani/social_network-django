@@ -8,7 +8,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from .models import Relation, DirectMessage
 from .forms import EditUserForm, UserCreationForm, UserLoginForm, DirectMessageForm
-from itertools import chain
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -178,9 +177,9 @@ class DirectMessageView(LoginRequiredMixin, View):
 
     def get(self, request, user_id):
         form = self.form_class
-        message1 = DirectMessage.objects.filter(from_user=request.user.id , to_user=user_id)
+        message1 = DirectMessage.objects.filter(from_user=request.user.id, to_user=user_id)
         message2 = DirectMessage.objects.filter(from_user=user_id, to_user=request.user.id)
-        message = chain(message1,message2)
+        message = message1 | message2
         return render(request, 'accounts/messages.html', {'form': form, 'message': message})
 
     @method_decorator(login_required)
@@ -193,6 +192,7 @@ class DirectMessageView(LoginRequiredMixin, View):
         new_message.save()
         messages.success(request, 'you sent a new message', 'success')
         return redirect('accounts:message', user_id)
+
 
 
 
